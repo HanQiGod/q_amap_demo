@@ -13,7 +13,7 @@ class QAmapDemoApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'QAmap Flutter Federated Demo',
+      title: 'Flutter版 高德地图 Demo',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0B8043)),
       ),
