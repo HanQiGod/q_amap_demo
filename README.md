@@ -27,13 +27,3 @@ Flutter 自研高德地图插件骨架（federated plugin）示例。
 
 - 能力对齐：`docs/capability_alignment.md`
 - 性能监控：`docs/performance_monitoring.md`
-
-## 测试执行
-
-```bash
-cd packages/q_amap_flutter
-flutter test
-
-cd example
-flutter test integration_test/plugin_integration_test.dart -d flutter-tester
-```
