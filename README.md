@@ -37,11 +37,3 @@ flutter test
 cd example
 flutter test integration_test/plugin_integration_test.dart -d flutter-tester
 ```
-
-## 推荐迭代顺序
-
-1. 接入真实地图渲染（`QAmapMapView` 对接高德 MapView）。
-2. 实现定位链路（单次定位 + 连续定位流）。
-3. 实现 POI 检索与逆地理编码。
-4. 实现路线规划与导航。
-5. 持续扩展能力对齐文档、集成测试覆盖率与性能监控指标。
