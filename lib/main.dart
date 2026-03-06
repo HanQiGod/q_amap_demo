@@ -47,6 +47,7 @@ class _QAmapDemoPageState extends State<QAmapDemoPage> {
   final List<String> _events = <String>[];
   StreamSubscription<QAmapLocation>? _locationSubscription;
   bool _isLocationStreaming = false;
+  bool _isSdkInitialized = false;
 
   @override
   void initState() {
@@ -66,6 +67,7 @@ class _QAmapDemoPageState extends State<QAmapDemoPage> {
         return;
       }
       setState(() {
+        _isSdkInitialized = true;
         _status = 'SDK 初始化完成（请替换 YOUR_ANDROID_KEY / YOUR_IOS_KEY）';
       });
     } catch (error) {
@@ -73,9 +75,22 @@ class _QAmapDemoPageState extends State<QAmapDemoPage> {
         return;
       }
       setState(() {
+        _isSdkInitialized = false;
         _status = 'SDK 初始化失败: $error';
       });
     }
+  }
+
+  bool _ensureSdkReady() {
+    if (_isSdkInitialized) {
+      return true;
+    }
+    if (mounted) {
+      setState(() {
+        _status = 'SDK 尚未初始化完成，请稍后重试';
+      });
+    }
+    return false;
   }
 
   Future<void> _moveToShanghai() async {
@@ -109,6 +124,9 @@ class _QAmapDemoPageState extends State<QAmapDemoPage> {
   }
 
   Future<void> _planDrivingRoute() async {
+    if (!_ensureSdkReady()) {
+      return;
+    }
     final QAmapMapController? controller = _controller;
     if (controller == null) {
       return;
@@ -191,6 +209,9 @@ class _QAmapDemoPageState extends State<QAmapDemoPage> {
   }
 
   Future<void> _startNavigation() async {
+    if (!_ensureSdkReady()) {
+      return;
+    }
     try {
       final bool launchedNative = await QAmapFlutter.startNavigation(
         const QAmapNavigationRequest(
@@ -218,6 +239,9 @@ class _QAmapDemoPageState extends State<QAmapDemoPage> {
   }
 
   Future<void> _locate() async {
+    if (!_ensureSdkReady()) {
+      return;
+    }
     try {
       final QAmapLocation? location = await QAmapFlutter.getCurrentLocation();
       if (!mounted) {
@@ -242,6 +266,9 @@ class _QAmapDemoPageState extends State<QAmapDemoPage> {
   }
 
   Future<void> _startLocationStream() async {
+    if (!_ensureSdkReady()) {
+      return;
+    }
     if (_isLocationStreaming) {
       return;
     }
@@ -302,6 +329,9 @@ class _QAmapDemoPageState extends State<QAmapDemoPage> {
   }
 
   Future<void> _searchCoffee() async {
+    if (!_ensureSdkReady()) {
+      return;
+    }
     try {
       final List<QAmapPoi> pois = await QAmapFlutter.searchPoi(
         const QAmapPoiSearchRequest(keyword: '咖啡', city: '上海'),
@@ -325,6 +355,9 @@ class _QAmapDemoPageState extends State<QAmapDemoPage> {
   }
 
   Future<void> _reverseGeocodeBund() async {
+    if (!_ensureSdkReady()) {
+      return;
+    }
     try {
       final QAmapReverseGeocodeResult? result =
           await QAmapFlutter.reverseGeocode(
@@ -413,16 +446,21 @@ class _QAmapDemoPageState extends State<QAmapDemoPage> {
                   child: const Text('移动镜头'),
                 ),
                 FilledButton(
-                  onPressed: _planDrivingRoute,
+                  onPressed: _isSdkInitialized ? _planDrivingRoute : null,
                   child: const Text('路线规划'),
                 ),
                 FilledButton(
-                  onPressed: _startNavigation,
+                  onPressed: _isSdkInitialized ? _startNavigation : null,
                   child: const Text('开始导航'),
                 ),
-                FilledButton(onPressed: _locate, child: const Text('获取定位')),
                 FilledButton(
-                  onPressed: _isLocationStreaming ? null : _startLocationStream,
+                  onPressed: _isSdkInitialized ? _locate : null,
+                  child: const Text('获取定位'),
+                ),
+                FilledButton(
+                  onPressed: _isSdkInitialized && !_isLocationStreaming
+                      ? _startLocationStream
+                      : null,
                   child: const Text('开始连续定位'),
                 ),
                 FilledButton(
@@ -430,11 +468,11 @@ class _QAmapDemoPageState extends State<QAmapDemoPage> {
                   child: const Text('停止连续定位'),
                 ),
                 FilledButton(
-                  onPressed: _searchCoffee,
+                  onPressed: _isSdkInitialized ? _searchCoffee : null,
                   child: const Text('POI 检索'),
                 ),
                 FilledButton(
-                  onPressed: _reverseGeocodeBund,
+                  onPressed: _isSdkInitialized ? _reverseGeocodeBund : null,
                   child: const Text('逆地理编码'),
                 ),
               ],
